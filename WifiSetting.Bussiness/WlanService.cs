@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WifiSetting.Bussiness
 {
-    public class WlanService : IWlanService
+public class WlanService : IWlanService
     {
         public WlanService()
         {
@@ -114,6 +114,8 @@ namespace WifiSetting.Bussiness
             return wlanInfoItems;
         }
 
+        #region 连接/断开
+
         public bool ConnectToWlan(WlanInfoItem wlanItem, string key, bool isAutoConnect, out string errorMsg)
         {
             errorMsg = string.Empty;
@@ -150,6 +152,39 @@ namespace WifiSetting.Bussiness
                 return false;
             }
         }
+        public void DisConnectToWlan(WlanInfoItem wlanInfoItem)
+        {
+            if (wlanInfoItem.IsConnected)
+            {
+                wlanInfoItem.WlanInterface.DeleteProfile(wlanInfoItem.Name);
+            }
+        }
+
+        #endregion
+
+        #region 获取所有连接协议
+
+        public List<WlanProfileItem> GetCurrentConnectedProfiles()
+        {
+            var list = new List<WlanProfileItem>();
+            foreach (WlanClient.WlanInterface wlanIface in Client.Interfaces)
+            {
+                foreach (Wlan.WlanProfileInfo profileInfo in wlanIface.GetProfiles())
+                {
+                    string name = profileInfo.profileName; // this is typically the network's SSID
+                    string xml = wlanIface.GetProfileXml(profileInfo.profileName);
+                    Debug.WriteLine($"profileName:{name},xml:{xml} ");
+                    list.Add(new WlanProfileItem()
+                    {
+                        ProfileName = name,
+                        XmlContent = xml
+                    });
+                }
+            }
+            return list;
+        }
+
+        #endregion
 
         #region 内部代码
 
@@ -265,38 +300,5 @@ namespace WifiSetting.Bussiness
 
         #endregion
 
-        public List<WlanProfileItem> GetCurrentConnectedProfiles()
-        {
-            var list = new List<WlanProfileItem>();
-            foreach (WlanClient.WlanInterface wlanIface in Client.Interfaces)
-            {
-                foreach (Wlan.WlanProfileInfo profileInfo in wlanIface.GetProfiles())
-                {
-                    string name = profileInfo.profileName; // this is typically the network's SSID
-                    string xml = wlanIface.GetProfileXml(profileInfo.profileName);
-                    Debug.WriteLine($"profileName:{name},xml:{xml} ");
-                    list.Add(new WlanProfileItem()
-                    {
-                        ProfileName = name,
-                        XmlContent = xml
-                    });
-                }
-            }
-            return list;
-        }
-
-        public void DisConnectToWlan(WlanInfoItem wlanInfoItem)
-        {
-            if (wlanInfoItem.IsConnected)
-            {
-                wlanInfoItem.WlanInterface.DeleteProfile(wlanInfoItem.Name);
-            }
-        }
-    }
-
-    public class WlanProfileItem
-    {
-        public string ProfileName { get; set; }
-        public string XmlContent { get; set; }
     }
 }

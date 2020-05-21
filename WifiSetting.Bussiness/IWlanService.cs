@@ -7,6 +7,7 @@ namespace WifiSetting.Bussiness
     {
         List<WlanInfoItem> GetAllWlanList();
         void DisConnectToWlan(WlanInfoItem wlanInfoItem);
+        bool ConnectToWlan(WlanInfoItem wlanInfoItem, string password, bool isAutoConnect, out string errorMsg);
     }
 
     public class WlanInfoItem
@@ -48,5 +49,11 @@ namespace WifiSetting.Bussiness
         /// WlanInterface
         /// </summary>
         public WlanClient.WlanInterface WlanInterface { get; set; }
+    }
+    
+    public class WlanProfileItem
+    {
+        public string ProfileName { get; set; }
+        public string XmlContent { get; set; }
     }
 }
