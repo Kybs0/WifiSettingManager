@@ -1,0 +1,51 @@
+﻿<Window x:Class="WifiSettingManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WifiSettingManager"
+        xmlns:bussiness="clr-namespace:WifiSetting.Bussiness;assembly=WifiSetting.Bussiness"
+        mc:Ignorable="d"
+        Title="Wifi管理工具" Height="600" Width="900" x:Name="TheMainWindow">
+    <Window.Resources>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Button x:Name="RefreshButton" Content="刷新" HorizontalAlignment="Center" Width="100" Height="26" 
+                VerticalContentAlignment="Center" Click="RefreshButton_OnClick"></Button>
+        <DataGrid Grid.Row="1" ItemsSource="{Binding ElementName=TheMainWindow,Path=WlanInfoItems}"
+                  AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                  RowHeight="28" ColumnHeaderHeight="28" BorderThickness="0" IsReadOnly="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="名称" MaxWidth="200" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="信号强度" Width="80" Binding="{Binding SignalQuality}"/>
+                <DataGridCheckBoxColumn Header="需要密码" Width="80" Binding="{Binding IsSecurityEnabled}"/>
+                <DataGridCheckBoxColumn Header="缓存" Width="80" Binding="{Binding HasProfile}"/>
+                <DataGridCheckBoxColumn Header="连接状态" Width="80" Binding="{Binding IsConnected}"/>
+                <DataGridTextColumn Header="网络认证" Width="120" Binding="{Binding AuthAlgorithmType}"/>
+                <DataGridTextColumn Header="网络加解密" Width="80" Binding="{Binding CipherAlgorithmType}"/>
+                <DataGridTemplateColumn Header="操作" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type bussiness:WlanInfoItem}">
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="ConnectButton" Content="连接" Width="60" Background="Transparent" Click="ConnectButton_OnClick"/>
+                                <Button x:Name="DisconnectButton" Content="断开" Width="60" Background="Transparent" Visibility="Collapsed"
+                                        Click="DisconnectButton_OnClick"/>
+                            </StackPanel>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                                    <Setter TargetName="ConnectButton" Property="Visibility" Value="Collapsed"></Setter>
+                                    <Setter TargetName="DisconnectButton" Property="Visibility" Value="Visible"></Setter>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <TextBlock x:Name="NoWlanTextBlock" Grid.Row="1" Text="貌似没有无线网卡" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Red"/>
+    </Grid>
+</Window>
